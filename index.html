@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>danuferd-mockup - Solusi Cepat Pinjaman Kendaraan Terpercaya</title>
+    <meta name="description" content="Dapatkan pinjaman multiguna dan pembiayaan mobil impian Anda dengan proses kilat, bunga ringan, dan keamanan terjamin. Diawasi oleh OJK. Cek simulasinya sekarang!">
+    <link rel="icon" href="/assets/images/favicon.ico" type="image/x-icon">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Poppins', 'sans-serif'],
+            },
+            colors: {
+              primary: '#00AEC7',
+              'primary-hover': '#009cb8',
+            }
+          }
+        }
+      }
+    </script>
+    <style type="text/tailwindcss">
+      :root {
+        --header-height: 4rem; /* 64px */
+      }
+      body {
+        @apply font-sans text-neutral-700 antialiased;
+      }
+      main {
+        padding-top: var(--header-height);
+      }
+      /* Responsive table for Produk page */
+      @media (max-width: 992px) {
+        .responsive-table thead {
+          @apply hidden;
+        }
+        .responsive-table, .responsive-table tbody, .responsive-table tr, .responsive-table td {
+          @apply block w-full;
+        }
+        .responsive-table tr {
+          @apply mb-4 border border-slate-200 rounded-lg overflow-hidden shadow-sm;
+        }
+        .responsive-table td {
+          @apply text-right relative pl-[50%] py-3 px-4 border-b border-slate-200;
+        }
+        .responsive-table tr td:last-child {
+          @apply border-b-0;
+        }
+        .responsive-table td::before {
+          content: attr(data-label);
+          @apply absolute left-4 w-[45%] pr-2.5 whitespace-nowrap text-left font-semibold text-neutral-800;
+        }
+      }
+    </style>
+
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.8.2"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-white">
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/index.tsx"></script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
