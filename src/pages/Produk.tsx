@@ -37,8 +37,8 @@ const Produk = () => {
             setError(null);
             try {
                 const categories = ['mobil-baru', 'mobil-bekas', 'motor-baru', 'motor-bekas'];
-                const promises = categories.map(category => 
-                    fetch(`/database/${category}.json`).then(res => res.ok ? res.json() : [])
+                const promises = categories.map(category =>
+                    fetch(`./database/${category}.json`).then(res => res.ok ? res.json() : [])
                 );
                 
                 const results = await Promise.all(promises);
