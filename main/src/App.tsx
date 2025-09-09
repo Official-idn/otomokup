@@ -23,6 +23,7 @@ function App() {
           <Route
             path="/admin"
             element={
+              // FIX: Explicitly pass Admin as children prop to fix TS error
               <ProtectedRoute allowPageLoad={true}>
                 <Admin />
               </ProtectedRoute>

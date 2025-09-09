@@ -14,7 +14,7 @@ const TentangKami = () => {
             <section className="py-20">
                 <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                     <div className="text-center">
-                        <img src="/assets/bahan/digital-process.svg" alt="Tim otoweb bekerja" className="max-w-md mx-auto" />
+                        <img src="/assets/images/about-us-image.jpg" alt="Tim danuferd-mockup bekerja sama di kantor" className="max-w-md mx-auto rounded-lg shadow-xl" />
                     </div>
                     <div>
                         <h2 className="text-3xl md:text-4xl font-bold mb-6 text-left">Siapa Kami</h2>

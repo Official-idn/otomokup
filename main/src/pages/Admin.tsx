@@ -31,8 +31,11 @@ class VehicleDB {
         this.db = null;
     }
 
-    async init() {
+    async init(): Promise<IDBDatabase> {
         return new Promise((resolve, reject) => {
+            if (this.db) {
+                return resolve(this.db);
+            }
             const request = indexedDB.open(this.dbName, this.version);
 
             request.onerror = () => reject(request.error);
@@ -56,10 +59,10 @@ class VehicleDB {
         });
     }
 
-    async getAllVehicles() {
-        if (!this.db) await this.init();
+    async getAllVehicles(): Promise<Vehicle[]> {
+        await this.init();
         return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction(['vehicles'], 'readonly');
+            const transaction = this.db!.transaction(['vehicles'], 'readonly');
             const store = transaction.objectStore('vehicles');
             const request = store.getAll();
 
@@ -68,10 +71,10 @@ class VehicleDB {
         });
     }
 
-    async addVehicle(vehicle) {
-        if (!this.db) await this.init();
+    async addVehicle(vehicle: Vehicle): Promise<IDBValidKey> {
+        await this.init();
         return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction(['vehicles'], 'readwrite');
+            const transaction = this.db!.transaction(['vehicles'], 'readwrite');
             const store = transaction.objectStore('vehicles');
             const request = store.add(vehicle);
 
@@ -80,10 +83,10 @@ class VehicleDB {
         });
     }
 
-    async updateVehicle(vehicle) {
-        if (!this.db) await this.init();
+    async updateVehicle(vehicle: Vehicle): Promise<IDBValidKey> {
+        await this.init();
         return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction(['vehicles'], 'readwrite');
+            const transaction = this.db!.transaction(['vehicles'], 'readwrite');
             const store = transaction.objectStore('vehicles');
             const request = store.put(vehicle);
 
@@ -92,34 +95,34 @@ class VehicleDB {
         });
     }
 
-    async deleteVehicle(id) {
-        if (!this.db) await this.init();
+    async deleteVehicle(id: string): Promise<void> {
+        await this.init();
         return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction(['vehicles'], 'readwrite');
+            const transaction = this.db!.transaction(['vehicles'], 'readwrite');
             const store = transaction.objectStore('vehicles');
             const request = store.delete(id);
 
-            request.onsuccess = () => resolve(request.result);
+            request.onsuccess = () => resolve();
             request.onerror = () => reject(request.error);
         });
     }
 
-    async clearAllVehicles() {
-        if (!this.db) await this.init();
+    async clearAllVehicles(): Promise<void> {
+        await this.init();
         return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction(['vehicles'], 'readwrite');
+            const transaction = this.db!.transaction(['vehicles'], 'readwrite');
             const store = transaction.objectStore('vehicles');
             const request = store.clear();
 
-            request.onsuccess = () => resolve(request.result);
+            request.onsuccess = () => resolve();
             request.onerror = () => reject(request.error);
         });
     }
 
-    async setAuthStatus(isAuthenticated) {
-        if (!this.db) await this.init();
+    async setAuthStatus(isAuthenticated: boolean): Promise<IDBValidKey> {
+        await this.init();
         return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction(['auth'], 'readwrite');
+            const transaction = this.db!.transaction(['auth'], 'readwrite');
             const store = transaction.objectStore('auth');
             const request = store.put({ key: 'authenticated', value: isAuthenticated });
 
@@ -128,10 +131,10 @@ class VehicleDB {
         });
     }
 
-    async getAuthStatus() {
-        if (!this.db) await this.init();
+    async getAuthStatus(): Promise<boolean> {
+        await this.init();
         return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction(['auth'], 'readonly');
+            const transaction = this.db!.transaction(['auth'], 'readonly');
             const store = transaction.objectStore('auth');
             const request = store.get('authenticated');
 
@@ -143,7 +146,7 @@ class VehicleDB {
 
 // CSV Parser and Validator
 class CSVProcessor {
-    static parseCSV(csvText) {
+    static parseCSV(csvText: string): { vehicles: Vehicle[], errors: string[] } {
         const lines = csvText.split('\n').filter(line => line.trim());
         if (lines.length < 2) {
             throw new Error('CSV file must have at least a header row and one data row');
@@ -158,8 +161,8 @@ class CSVProcessor {
             throw new Error(`Missing required headers: ${missingHeaders.join(', ')}`);
         }
 
-        const vehicles = [];
-        const errors = [];
+        const vehicles: Vehicle[] = [];
+        const errors: string[] = [];
 
         for (let i = 1; i < lines.length; i++) {
             try {
@@ -187,7 +190,7 @@ class CSVProcessor {
                 vehicle.updated_at = new Date().toISOString();
 
                 vehicles.push(vehicle as Vehicle);
-            } catch (error) {
+            } catch (error: any) {
                 errors.push(`Row ${i + 1}: ${error.message}`);
             }
         }
@@ -195,24 +198,24 @@ class CSVProcessor {
         return { vehicles, errors };
     }
 
-    static validateVehicle(vehicle) {
+    static validateVehicle(vehicle: Partial<Vehicle>): string[] {
         const errors = [];
 
         if (!vehicle.merk?.trim()) errors.push('Merk is required');
         if (!vehicle.model?.trim()) errors.push('Model is required');
         if (!vehicle.tahun?.trim()) errors.push('Tahun is required');
         if (!vehicle.harga?.trim()) errors.push('Harga is required');
-        if (!['Mobil', 'Motor'].includes(vehicle.kategori)) errors.push('Kategori must be Mobil or Motor');
-        if (!['Baru', 'Bekas'].includes(vehicle.kondisi)) errors.push('Kondisi must be Baru or Bekas');
+        if (!vehicle.kategori || !['Mobil', 'Motor'].includes(vehicle.kategori)) errors.push('Kategori must be Mobil or Motor');
+        if (!vehicle.kondisi || !['Baru', 'Bekas'].includes(vehicle.kondisi)) errors.push('Kondisi must be Baru or Bekas');
 
         // Validate numeric fields
-        if (vehicle.tahun && isNaN(vehicle.tahun)) errors.push('Tahun must be a number');
-        if (vehicle.harga && isNaN(vehicle.harga.replace(/,/g, ''))) errors.push('Harga must be a number');
+        if (vehicle.tahun && isNaN(Number(vehicle.tahun))) errors.push('Tahun must be a number');
+        if (vehicle.harga && isNaN(Number(vehicle.harga.replace(/,/g, '')))) errors.push('Harga must be a number');
 
         return errors;
     }
 
-    static generateCSVTemplate() {
+    static generateCSVTemplate(): string {
         const headers = ['merk', 'model', 'tipe', 'warna', 'tahun', 'cc', 'transmisi', 'lokasi', 'harga', 'kategori', 'kondisi'];
         const sampleData = [
             ['Toyota', 'Avanza 1.5 G', 'MPV', 'Hitam', '2024', '1500', 'CVT', 'Jakarta', '255000000', 'Mobil', 'Baru'],
@@ -228,7 +231,7 @@ class CSVProcessor {
         return csvContent;
     }
 
-    static exportToCSV(vehicles) {
+    static exportToCSV(vehicles: Vehicle[]): string {
         if (vehicles.length === 0) {
             throw new Error('No data to export');
         }
@@ -247,8 +250,8 @@ class CSVProcessor {
             vehicle.harga,
             vehicle.kategori,
             vehicle.kondisi,
-            vehicle.created_at,
-            vehicle.updated_at
+            vehicle.created_at || new Date().toISOString(),
+            vehicle.updated_at || new Date().toISOString()
         ]);
 
         const csvContent = [
@@ -275,11 +278,10 @@ const Admin = () => {
 
     // Database and CSV processor instances
     const [vehicleDB] = useState(() => new VehicleDB());
-    const [csvProcessor] = useState(() => new CSVProcessor());
 
     // Vehicle data management
-    const [vehicles, setVehicles] = useState<any[]>([]);
-    const [editingVehicle, setEditingVehicle] = useState<any | null>(null);
+    const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+    const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
     const [singleVehicleForm, setSingleVehicleForm] = useState({
         merk: '',
         model: '',
@@ -299,6 +301,7 @@ const Admin = () => {
     useEffect(() => {
         const checkAuth = async () => {
             try {
+                // FIX: getAuthStatus now correctly returns a boolean, resolving the type error.
                 const authStatus = await vehicleDB.getAuthStatus();
                 setIsAuthenticated(authStatus);
 
@@ -317,6 +320,7 @@ const Admin = () => {
     // Load vehicles from IndexedDB
     const loadVehicles = async () => {
         try {
+            // FIX: getAllVehicles now correctly returns Vehicle[], resolving the type error.
             const vehiclesData = await vehicleDB.getAllVehicles();
             setVehicles(vehiclesData);
         } catch (error) {
@@ -368,7 +372,7 @@ const Admin = () => {
     // Initialize dummy data
     useEffect(() => {
         if (isAuthenticated && vehicles.length === 0) {
-            const dummyData = [
+            const dummyData: Vehicle[] = [
                 {
                     id: 'dummy001',
                     merk: 'Toyota',
@@ -404,17 +408,7 @@ const Admin = () => {
 
     // CSV Template Download
     const downloadCSVTemplate = () => {
-        const headers = ['merk', 'model', 'tipe', 'warna', 'tahun', 'cc', 'transmisi', 'lokasi', 'harga', 'kategori', 'kondisi'];
-        const sampleData = [
-            ['Toyota', 'Avanza 1.5 G', 'MPV', 'Hitam', '2024', '1500', 'CVT', 'Jakarta', '255000000', 'Mobil', 'Baru'],
-            ['Honda', 'PCX 160 ABS', 'Matic', 'Putih', '2024', '160', 'Automatic', 'Surabaya', '35000000', 'Motor', 'Baru']
-        ];
-
-        const csvContent = [
-            headers.join(','),
-            ...sampleData.map(row => row.map(cell => `"${cell}"`).join(','))
-        ].join('\n');
-
+        const csvContent = CSVProcessor.generateCSVTemplate();
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
@@ -461,9 +455,11 @@ const Admin = () => {
         if (!validateSingleVehicleForm()) return;
 
         try {
-            const newVehicle = {
+            const newVehicle: Vehicle = {
                 id: `vehicle_${Date.now()}`,
                 ...singleVehicleForm,
+                kategori: singleVehicleForm.kategori as 'Mobil' | 'Motor',
+                kondisi: singleVehicleForm.kondisi as 'Baru' | 'Bekas',
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
             };
@@ -493,17 +489,17 @@ const Admin = () => {
     };
 
     // Edit vehicle handlers
-    const handleEditVehicle = (vehicle: any) => {
+    const handleEditVehicle = (vehicle: Vehicle) => {
         setEditingVehicle(vehicle);
         setSingleVehicleForm({
             merk: vehicle.merk,
             model: vehicle.model,
-            tipe: vehicle.tipe,
-            warna: vehicle.warna,
+            tipe: vehicle.tipe || '',
+            warna: vehicle.warna || '',
             tahun: vehicle.tahun,
-            cc: vehicle.cc,
-            transmisi: vehicle.transmisi,
-            lokasi: vehicle.lokasi,
+            cc: vehicle.cc || '',
+            transmisi: vehicle.transmisi || '',
+            lokasi: vehicle.lokasi || '',
             harga: vehicle.harga,
             kategori: vehicle.kategori,
             kondisi: vehicle.kondisi
@@ -515,9 +511,11 @@ const Admin = () => {
         if (!editingVehicle || !validateSingleVehicleForm()) return;
 
         try {
-            const updatedVehicle = {
+            const updatedVehicle: Vehicle = {
                 ...editingVehicle,
                 ...singleVehicleForm,
+                kategori: singleVehicleForm.kategori as 'Mobil' | 'Motor',
+                kondisi: singleVehicleForm.kondisi as 'Baru' | 'Bekas',
                 updated_at: new Date().toISOString()
             };
 
@@ -589,7 +587,8 @@ const Admin = () => {
                 return;
             }
 
-            const csvContent = csvProcessor.exportToCSV(vehicles);
+            // FIX: Accessed static method 'exportToCSV' on the class 'CSVProcessor' directly.
+            const csvContent = CSVProcessor.exportToCSV(vehicles);
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
@@ -601,9 +600,9 @@ const Admin = () => {
             document.body.removeChild(link);
 
             alert('Data berhasil diekspor ke CSV!');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error exporting data:', error);
-            alert('Terjadi kesalahan saat mengekspor data');
+            alert(`Terjadi kesalahan saat mengekspor data: ${error.message}`);
         }
     };
 
@@ -643,7 +642,8 @@ const Admin = () => {
 
         try {
             const csvText = await selectedFile.text();
-            const { vehicles, errors } = csvProcessor.parseCSV(csvText);
+            // FIX: Accessed static method 'parseCSV' on the class 'CSVProcessor' directly.
+            const { vehicles: parsedVehicles, errors } = CSVProcessor.parseCSV(csvText);
 
             if (errors.length > 0) {
                 setUploadStatus('error');
@@ -652,9 +652,9 @@ const Admin = () => {
             }
 
             // Filter vehicles by category if specified
-            let vehiclesToAdd = vehicles;
+            let vehiclesToAdd = parsedVehicles;
             if (uploadCategory) {
-                vehiclesToAdd = vehicles.filter(vehicle => {
+                vehiclesToAdd = parsedVehicles.filter(vehicle => {
                     if (uploadCategory === 'mobil-baru') {
                         return vehicle.kategori === 'Mobil' && vehicle.kondisi === 'Baru';
                     } else if (uploadCategory === 'mobil-bekas') {
@@ -687,10 +687,10 @@ const Admin = () => {
 
             setTimeout(() => setUploadStatus(''), 3000);
 
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error processing CSV:', error);
             setUploadStatus('error');
-            setUploadErrors(['Terjadi kesalahan saat memproses file CSV']);
+            setUploadErrors([`Terjadi kesalahan saat memproses file CSV: ${error.message}`]);
         }
     };
 
@@ -1061,7 +1061,7 @@ const Admin = () => {
                                                 <td className="border border-slate-200 p-3">{vehicle.kategori}</td>
                                                 <td className="border border-slate-200 p-3">{vehicle.kondisi}</td>
                                                 <td className="border border-slate-200 p-3">
-                                                    Rp {parseInt(vehicle.harga).toLocaleString('id-ID')}
+                                                    Rp {parseInt(vehicle.harga, 10).toLocaleString('id-ID')}
                                                 </td>
                                                 <td className="border border-slate-200 p-3 text-center">
                                                     <div className="flex justify-center gap-2">

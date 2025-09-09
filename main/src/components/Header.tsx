@@ -15,7 +15,7 @@ const Header = () => {
         document.body.style.overflow = !isMenuOpen ? 'hidden' : 'auto';
     };
 
-    if (location.pathname === '/admin-control') {
+    if (location.pathname === '/admin') {
         return null;
     }
 

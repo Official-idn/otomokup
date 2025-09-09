@@ -17,7 +17,8 @@ const checkUserRole = (): string => {
  * @param {React.ReactNode} props.children - The child components to render.
  * @param {boolean} props.allowPageLoad - Whether to allow the page to load before checking authentication.
  */
-const ProtectedRoute = ({ children, allowPageLoad = false }: { children: React.ReactNode; allowPageLoad?: boolean }) => {
+// FIX: Made children prop optional to resolve TypeScript inference issue in App.tsx
+const ProtectedRoute = ({ children, allowPageLoad = false }: { children?: React.ReactNode; allowPageLoad?: boolean }) => {
     const navigate = useNavigate();
     const userRole = checkUserRole();
 

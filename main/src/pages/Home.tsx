@@ -1,11 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
+interface Testimonial {
+    quote: string;
+    name: string;
+    loanType: string;
+    image: string;
+}
+
 const Home = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [testimonials, setTestimonials] = useState([]);
-    const trackRef = useRef(null);
-    const autoSlideInterval = useRef(null);
+    const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+    const trackRef = useRef<HTMLDivElement>(null);
+    // FIX: Changed NodeJS.Timeout to number, as setInterval in a browser context returns a number.
+    const autoSlideInterval = useRef<number | null>(null);
 
     useEffect(() => {
         fetch('/database/testimonials.json')
@@ -16,7 +24,7 @@ const Home = () => {
 
     useEffect(() => {
         if (trackRef.current) {
-            const track = trackRef.current as HTMLDivElement;
+            const track = trackRef.current;
             const slideWidth = track.children[0]?.getBoundingClientRect().width || 0;
             track.style.transform = `translateX(-${currentIndex * (slideWidth + 20)}px)`; // 20 is the gap
         }
@@ -35,7 +43,9 @@ const Home = () => {
     };
 
     const stopAutoSlide = () => {
-        clearInterval(autoSlideInterval.current);
+        if (autoSlideInterval.current) {
+            clearInterval(autoSlideInterval.current);
+        }
     };
 
     const moveToNextSlide = () => {
@@ -63,31 +73,31 @@ const Home = () => {
 
                     <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 mt-10">
                          <div className="bg-white p-6 rounded-xl shadow-lg text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-primary/20 flex flex-col">
-                            <div className="text-primary mx-auto mb-4"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 11l1.5-4.5h11L19 11M5 11v8a1 1 0 001 1h12a1 1 0 001-1v-8M5 11h14M7 15h2M15 15h2M6 8h12l-1 3H7l-1-3z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></div>
+                            <img src="/assets/bahan/loan-wallet.svg" alt="Pembiayaan Mobil" className="h-20 mx-auto mb-4" />
                             <h3 className="text-lg font-bold mb-2">Kredit Mobil Baru</h3>
                             <p className="flex-grow text-sm text-neutral-600 mb-4">Jangan biarkan mobil impian hanya jadi angan-angan. Kami hadirkan penawaran terbaik untuk mobil baru idaman Anda.</p>
                             <Link to="/pengajuan?tab=mobil-baru" className={btnClasses}>Cek Simulasi</Link>
                         </div>
                         <div className="bg-white p-6 rounded-xl shadow-lg text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-primary/20 flex flex-col">
-                            <div className="text-primary mx-auto mb-4"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 11l1.5-4.5h11L19 11M5 11v8a1 1 0 001 1h12a1 1 0 001-1v-8M5 11h14M7 15h2M15 15h2M6 8h12l-1 3H7l-1-3z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></div>
+                            <img src="/assets/bahan/loan-wallet.svg" alt="Pembiayaan Mobil Bekas" className="h-20 mx-auto mb-4" />
                             <h3 className="text-lg font-bold mb-2">Kredit Mobil Bekas</h3>
                             <p className="flex-grow text-sm text-neutral-600 mb-4">Pilihan cerdas untuk memiliki mobil berkualitas dengan cicilan yang lebih ringan dan terjangkau.</p>
                             <Link to="/pengajuan?tab=mobil-bekas" className={btnClasses}>Cek Simulasi</Link>
                         </div>
                          <div className="bg-white p-6 rounded-xl shadow-lg text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-primary/20 flex flex-col">
-                            <div className="text-primary mx-auto mb-4"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 16V5h3l2 3h6v3l-2 3H8l-3 2zm14 0h-2v-3h2v3zM6 16H4v-2h2v2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="7.5" cy="18.5" r="2.5" stroke="currentColor" strokeWidth="2"/><circle cx="17.5" cy="18.5" r="2.5" stroke="currentColor" strokeWidth="2"/></svg></div>
+                            <img src="/assets/bahan/loan-wallet.svg" alt="Pembiayaan Motor" className="h-20 mx-auto mb-4" />
                             <h3 className="text-lg font-bold mb-2">Kredit Motor Baru</h3>
                             <p className="flex-grow text-sm text-neutral-600 mb-4">Solusi gesit di jalanan padat. Dapatkan motor baru impian Anda dengan proses mudah dan cepat.</p>
                             <Link to="/pengajuan?tab=motor-baru" className={btnClasses}>Cek Simulasi</Link>
                         </div>
                         <div className="bg-white p-6 rounded-xl shadow-lg text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-primary/20 flex flex-col">
-                            <div className="text-primary mx-auto mb-4"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 16V5h3l2 3h6v3l-2 3H8l-3 2zm14 0h-2v-3h2v3zM6 16H4v-2h2v2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="7.5" cy="18.5" r="2.5" stroke="currentColor" strokeWidth="2"/><circle cx="17.5" cy="18.5" r="2.5" stroke="currentColor" strokeWidth="2"/></svg></div>
+                            <img src="/assets/bahan/loan-wallet.svg" alt="Pembiayaan Motor Bekas" className="h-20 mx-auto mb-4" />
                             <h3 className="text-lg font-bold mb-2">Kredit Motor Bekas</h3>
                             <p className="flex-grow text-sm text-neutral-600 mb-4">Miliki motor idaman dengan harga lebih ekonomis. Pilihan tepat untuk mobilitas harian Anda.</p>
                             <Link to="/pengajuan?tab=motor-bekas" className={btnClasses}>Cek Simulasi</Link>
                         </div>
                         <div className="bg-white p-6 rounded-xl shadow-lg text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-primary/20 flex flex-col">
-                            <div className="text-primary mx-auto mb-4"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+                           <img src="/assets/bahan/multiple-purpose-loan.svg" alt="Pinjaman Multiguna" className="h-20 mx-auto mb-4" />
                             <h3 className="text-lg font-bold mb-2">Pinjaman Multiguna</h3>
                             <p className="flex-grow text-sm text-neutral-600 mb-4">Butuh dana mendesak? Kendaraan Anda solusinya. Jadikan BPKB sebagai jaminan untuk dana tunai cepat.</p>
                             <Link to="/pengajuan?tab=multiguna" className={btnClasses}>Cek Simulasi</Link>
@@ -117,14 +127,17 @@ const Home = () => {
                                 <div className="flex-shrink-0 w-full md:w-[calc(50%-10px)] lg:w-[calc(33.333%-14px)] bg-white p-6 rounded-xl shadow-md" key={index}>
                                     <p className="italic mb-5 text-neutral-600">"{testi.quote}"</p>
                                     <div className="flex items-center gap-4 border-t border-slate-200 pt-4">
-                                        <img src={testi.image} alt={`Foto ${testi.name}`} className="w-12 h-12 rounded-full object-cover" />
-                                        <div><h4 className="font-bold text-neutral-800">{testi.name}</h4><p className="text-sm text-neutral-500">{testi.loanType}</p></div>
+                                        <img src={testi.image} alt={`Foto ${testi.name}`} className="w-12 h-12 rounded-full object-cover shrink-0" />
+                                        <div>
+                                            <h4 className="font-bold text-neutral-800">{testi.name}</h4>
+                                            <p className="text-sm text-neutral-500">{testi.loanType}</p>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
                         </div>
-                        <button className="absolute top-1/2 -translate-y-1/2 -left-4 md:-left-5 bg-white border border-slate-300 rounded-full w-10 h-10 z-10 text-2xl flex items-center justify-center shadow-md hover:bg-slate-100" onClick={moveToPrevSlide}>&lt;</button>
-                        <button className="absolute top-1/2 -translate-y-1/2 -right-4 md:-right-5 bg-white border border-slate-300 rounded-full w-10 h-10 z-10 text-2xl flex items-center justify-center shadow-md hover:bg-slate-100" onClick={moveToNextSlide}>&gt;</button>
+                        <button className="absolute top-1/2 -translate-y-1/2 -left-4 md:-left-5 bg-white border border-slate-300 rounded-full w-10 h-10 z-10 text-2xl flex items-center justify-center shadow-md hover:bg-slate-100" onClick={moveToPrevSlide} aria-label="Previous testimonial">&lt;</button>
+                        <button className="absolute top-1/2 -translate-y-1/2 -right-4 md:-right-5 bg-white border border-slate-300 rounded-full w-10 h-10 z-10 text-2xl flex items-center justify-center shadow-md hover:bg-slate-100" onClick={moveToNextSlide} aria-label="Next testimonial">&gt;</button>
                     </div>
                 </div>
             </section>
