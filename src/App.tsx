@@ -10,6 +10,7 @@ import Admin from './pages/Admin';
 import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
 import './styles/main.css';
+import './styles/custom.css';
 
 function App() {
   return (

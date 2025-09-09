@@ -6,10 +6,11 @@ export default defineConfig(({ mode }) => {
 
     // Get repository name for GitHub Pages base path
     const repoName = process.env.GITHUB_REPOSITORY?.split('/')[1] || 'otomokup';
+    const isGitHubPages = process.env.GITHUB_ACTIONS === 'true';
 
     return {
       // Set base path for GitHub Pages deployment
-      base: process.env.NODE_ENV === 'production' ? `/${repoName}/` : '/',
+      base: isGitHubPages ? `/${repoName}/` : '/',
       define: {
         'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
         'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
