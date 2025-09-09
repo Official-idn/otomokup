@@ -50,3 +50,7 @@ main {
     color: #1f2937;
   }
 }
+
+.hero-section {
+  background-image: url('/assets/images/hero-wallet.png');
+}

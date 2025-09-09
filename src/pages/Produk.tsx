@@ -38,7 +38,7 @@ const Produk = () => {
             try {
                 const categories = ['mobil-baru', 'mobil-bekas', 'motor-baru', 'motor-bekas'];
                 const promises = categories.map(category =>
-                    fetch(`./database/${category}.json`).then(res => res.ok ? res.json() : [])
+                    fetch(`/database/${category}.json`).then(res => res.ok ? res.json() : [])
                 );
                 
                 const results = await Promise.all(promises);
@@ -226,7 +226,7 @@ const Produk = () => {
                     <p className="mt-5 font-semibold text-neutral-700">Memuat Data Kendaraan...</p>
                 </div>
             )}
-            <section className="text-white text-center py-20 relative bg-cover bg-center bg-no-repeat" style={{backgroundImage: "url('/assets/images/hero-wallet.png')"}}>
+            <section className="text-white text-center py-20 relative bg-cover bg-center bg-no-repeat hero-section">
                 <div className="absolute inset-0 bg-neutral-800/70"></div>
                 <div className="container mx-auto px-4 relative z-10">
                     <h1 className="text-4xl md:text-5xl font-bold mb-4">Temukan Kendaraan Impian Anda</h1>
