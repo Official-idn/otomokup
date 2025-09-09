@@ -226,8 +226,9 @@ const Produk = () => {
                     <p className="mt-5 font-semibold text-neutral-700">Memuat Data Kendaraan...</p>
                 </div>
             )}
-            <section className="bg-neutral-800 text-white text-center py-20">
-                <div className="container mx-auto px-4">
+            <section className="text-white text-center py-20 relative bg-cover bg-center bg-no-repeat" style={{backgroundImage: "url('/assets/images/hero-wallet.png')"}}>
+                <div className="absolute inset-0 bg-neutral-800/70"></div>
+                <div className="container mx-auto px-4 relative z-10">
                     <h1 className="text-4xl md:text-5xl font-bold mb-4">Temukan Kendaraan Impian Anda</h1>
                     <p className="text-lg max-w-2xl mx-auto opacity-90">Pilih dari ribuan mobil dan motor baru atau bekas dengan skema pembiayaan terbaik.</p>
                 </div>

@@ -299,23 +299,19 @@ const Admin = () => {
 
     // Check authentication status on component mount
     useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                // FIX: getAuthStatus now correctly returns a boolean, resolving the type error.
-                const authStatus = await vehicleDB.getAuthStatus();
-                setIsAuthenticated(authStatus);
+        const checkAuth = () => {
+            const userRole = sessionStorage.getItem('userRole');
+            const isAdmin = userRole === 'admin';
+            setIsAuthenticated(isAdmin);
 
-                if (authStatus) {
-                    // Load vehicles if authenticated
-                    await loadVehicles();
-                }
-            } catch (error) {
-                console.error('Error checking authentication:', error);
+            if (isAdmin) {
+                // Load vehicles if authenticated
+                loadVehicles();
             }
         };
 
         checkAuth();
-    }, [vehicleDB]);
+    }, []);
 
     // Load vehicles from IndexedDB
     const loadVehicles = async () => {
@@ -329,36 +325,27 @@ const Admin = () => {
     };
 
     // Handle login form submission
-    const handleLogin = async (e: React.FormEvent) => {
+    const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
         setLoginError('');
 
         // Simple authentication - in production, this should be replaced with proper API call
         if (loginForm.username === 'admin' && loginForm.password === 'admin123') {
-            try {
-                await vehicleDB.setAuthStatus(true);
-                setIsAuthenticated(true);
-                await loadVehicles(); // Load vehicles after successful login
-            } catch (error) {
-                console.error('Error saving auth status:', error);
-                setLoginError('Terjadi kesalahan saat login');
-            }
+            sessionStorage.setItem('userRole', 'admin');
+            setIsAuthenticated(true);
+            loadVehicles(); // Load vehicles after successful login
         } else {
             setLoginError('Username atau password salah');
         }
     };
 
     // Handle logout
-    const handleLogout = async () => {
-        try {
-            await vehicleDB.setAuthStatus(false);
-            setIsAuthenticated(false);
-            setLoginForm({ username: '', password: '' });
-            setLoginError('');
-            setVehicles([]); // Clear vehicles data
-        } catch (error) {
-            console.error('Error during logout:', error);
-        }
+    const handleLogout = () => {
+        sessionStorage.removeItem('userRole');
+        setIsAuthenticated(false);
+        setLoginForm({ username: '', password: '' });
+        setLoginError('');
+        setVehicles([]); // Clear vehicles data
     };
 
     // Handle login form input changes

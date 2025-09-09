@@ -27,8 +27,8 @@ const Header = () => {
             <header className="h-[var(--header-height)] fixed top-0 left-0 w-full bg-white/90 backdrop-blur-md z-[100] shadow-sm">
                 <nav className="container mx-auto px-4 flex justify-between items-center h-full">
                     <NavLink to="/" className="flex items-center gap-2.5">
-                        <img src="/assets/images/oto-logo.svg" alt="otoweb Logo" className="h-10" />
-                        <span className="text-2xl font-bold text-primary">danuferd-mockup</span>
+                        <img src="/assets/images/logo-oto.svg" alt="Otomokup Logo" className="h-10" />
+                        <span className="text-2xl font-bold text-primary">Otomokup</span>
                     </NavLink>
                     <ul className="hidden md:flex gap-8">
                         <li><NavLink to="/" className={({ isActive }) => `${navLinkClasses} ${isActive ? activeNavLinkClasses : ''}`}>Home</NavLink></li>

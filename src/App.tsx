@@ -9,6 +9,7 @@ import FormPengajuan from './pages/FormPengajuan';
 import Admin from './pages/Admin';
 import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
+import './styles/main.css';
 
 function App() {
   return (

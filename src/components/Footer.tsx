@@ -21,6 +21,7 @@ const Footer = () => {
         } else {
             sessionStorage.setItem('userRole', 'admin');
             alert('Anda telah login sebagai admin. Anda sekarang dapat mengakses halaman Admin Control Panel.');
+            navigate('/admin');
         }
         setUserRole(newRole);
     };

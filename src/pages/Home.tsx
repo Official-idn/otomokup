@@ -60,8 +60,9 @@ const Home = () => {
 
     return (
         <>
-            <section className="pt-20 pb-20 bg-gradient-to-br from-slate-100 to-cyan-50">
-                <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+            <section className="pt-20 pb-20 relative bg-cover bg-center bg-no-repeat" style={{backgroundImage: "url('/assets/images/hero-bg.jpg')"}}>
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-100/80 to-cyan-50/80"></div>
+                <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-10 items-center relative z-10">
                     <div className="text-center md:text-left">
                         <h1 className="text-4xl lg:text-5xl font-bold text-neutral-800 mb-5">Mobil Impian di Depan Mata? Dapatkan Solusi Dananya di Sini.</h1>
                         <p className="text-lg text-neutral-600 mb-10">Pilih produk pembiayaan yang paling sesuai dengan kebutuhan Anda di bawah ini.</p>
