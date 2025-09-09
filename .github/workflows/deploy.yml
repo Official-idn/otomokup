@@ -21,9 +21,6 @@ concurrency:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
     - name: Checkout code
@@ -46,6 +43,9 @@ jobs:
 
     - name: Copy 404.html to dist
       run: cp public/404.html dist/404.html
+
+    - name: Copy _headers to dist
+      run: cp public/_headers dist/_headers
 
     - name: Setup Pages
       uses: actions/configure-pages@v4

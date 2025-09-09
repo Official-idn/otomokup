@@ -1,40 +1,48 @@
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 import path from 'path';
-import { defineConfig, loadEnv } from 'vite';
 
-export default defineConfig(({ mode }) => {
-    const env = loadEnv(mode, '.', '');
+// https://vitejs.dev/config/
+export default defineConfig({
+  // Konfigurasi base path untuk deployment di GitHub Pages
+  base: '/otomokup/',
 
-    // Get repository name for GitHub Pages base path
-    const repoName = process.env.GITHUB_REPOSITORY?.split('/')[1] || 'otomokup';
-    const isGitHubPages = process.env.GITHUB_ACTIONS === 'true';
+  // Menentukan folder 'public' untuk aset statis
+  publicDir: 'public',
 
-    return {
-      // Set base path for GitHub Pages deployment
-      base: '/otomokup/',
-      publicDir: 'public',
-      define: {
-        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
-      },
-      resolve: {
-        alias: {
-          // FIX: __dirname is not available in ES modules. Use path.resolve('./') instead.
-          '@': path.resolve('./'),
-        }
-      },
-      build: {
-        // Generate source maps for better debugging
-        sourcemap: false,
-        // Ensure assets are handled correctly
-        assetsDir: 'assets',
-        // Optimize chunks
-        rollupOptions: {
-          output: {
-            manualChunks: {
-              vendor: ['react', 'react-dom', 'react-router-dom'],
-            },
-          },
-        },
-      },
-    };
+  // Plugin standar untuk React
+  plugins: [react()],
+  
+  // Menghapus API Key dari frontend untuk keamanan
+  define: {
+    // Kosongkan bagian ini
+  },
+
+  // Alias path untuk import yang lebih bersih
+  resolve: {
+    alias: {
+      '@': path.resolve('./'),
+    },
+  },
+  
+  build: {
+   // Optimisasi build dengan memisahkan library vendor
+   rollupOptions: {
+     output: {
+       manualChunks: {
+         vendor: ['react', 'react-dom', 'react-router-dom'],
+       },
+     },
+   },
+   // Keamanan: Hapus source maps di production untuk mencegah informasi sensitif
+   sourcemap: false,
+   // Minify untuk performa dan keamanan
+   minify: 'terser',
+   terserOptions: {
+     compress: {
+       drop_console: true,
+       drop_debugger: true,
+     },
+   },
+ },
 });
