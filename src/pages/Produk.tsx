@@ -1,6 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
+type Vehicle = {
+    id: any;
+    Brand: string;
+    Produk: string;
+    Type: string;
+    Warna: string;
+    tahun: number;
+    CC: any;
+    Transmisi: string;
+    Lokasi: string;
+    Harga: number;
+    Kategori: string;
+    Kondisi: string;
+};
+
 const Produk = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -12,23 +27,20 @@ const Produk = () => {
     const MOTORCYCLE_BRANDS = ['KTM', 'Kawasaki', 'Vespa', 'Yamaha'];
 
     // State Management
-    const [allVehicles, setAllVehicles] = useState([]);
-    const [filteredVehicles, setFilteredVehicles] = useState([]);
-    const [uniqueValues, setUniqueValues] = useState({ brands: [], types: [], transmissions: [], locations: [] });
-    
+    const [allVehicles, setAllVehicles] = useState<Vehicle[]>([]);
+    const [filteredVehicles, setFilteredVehicles] = useState<Vehicle[]>([]);
+    const [uniqueValues, setUniqueValues] = useState<{ brands: string[]; types: string[]; transmissions: string[]; locations: string[]; }>({ brands: [], types: [], transmissions: [], locations: [] });
+
     const [currentMainTab, setCurrentMainTab] = useState(searchParams.get('tab') || 'mobil-baru');
     const [currentBrandTab, setCurrentBrandTab] = useState('');
-    
     const [filters, setFilters] = useState({ search: '', brand: '', priceMin: '', priceMax: '', type: '', yearMin: '', yearMax: '', transmission: '', location: '' });
-    
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
-    
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null);
     const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
-    
-    const brandTabsRef = useRef(null);
+
+    const brandTabsRef = useRef<HTMLDivElement>(null);
 
     // Data Fetching and Normalization
     useEffect(() => {
@@ -84,7 +96,7 @@ const Produk = () => {
     useEffect(() => {
         if (allVehicles.length === 0) return;
 
-        let filteredBrands = [];
+        let filteredBrands: string[] = [];
         if (currentMainTab === 'mobil-baru' || currentMainTab === 'mobil-bekas') {
             // Filter vehicles for current tab and get available brands that are in CAR_BRANDS
             const tabVehicles = allVehicles.filter(v =>
@@ -148,20 +160,20 @@ const Produk = () => {
 
 
     // Handlers
-    const handleMainTabClick = (tab) => {
+    const handleMainTabClick = (tab: string) => {
         setCurrentMainTab(tab);
         setCurrentBrandTab('');
         setFilters({ search: '', brand: '', priceMin: '', priceMax: '', type: '', yearMin: '', yearMax: '', transmission: '', location: '' });
     };
 
-    const handleBrandTabClick = (brand) => setCurrentBrandTab(brand);
-    const handleFilterChange = (e) => setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    const handleBrandTabClick = (brand: string) => setCurrentBrandTab(brand);
+    const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
     const resetFilters = () => {
         setFilters({ search: '', brand: '', priceMin: '', priceMax: '', type: '', yearMin: '', yearMax: '', transmission: '', location: '' });
         setCurrentBrandTab('');
     };
-    
-    const selectVehicle = (vehicle) => {
+
+    const selectVehicle = (vehicle: Vehicle | { Produk: string; Brand?: string }) => {
         if (window.confirm(`Anda yakin ingin mengajukan pembiayaan untuk ${vehicle.Brand || ''} ${vehicle.Produk}?`)) {
             sessionStorage.setItem('selectedVehicle', JSON.stringify(vehicle));
             navigate('/form-pengajuan');
@@ -176,8 +188,8 @@ const Produk = () => {
     const vehiclesToShow = filteredVehicles.slice(startIndex, startIndex + itemsPerPage);
 
     // UI Helpers
-    const formatPrice = (price) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price);
-    const scrollBrandTabs = (direction) => {
+    const formatPrice = (price: number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price);
+    const scrollBrandTabs = (direction: 'left' | 'right') => {
         if (brandTabsRef.current) brandTabsRef.current.scrollBy({ left: direction === 'left' ? -200 : 200, behavior: 'smooth' });
     };
 
